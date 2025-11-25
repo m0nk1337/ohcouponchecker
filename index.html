@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Coupon Eligibility Checker</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      background: #fff5eb;
+      text-align: center;
+    }
+    input, select {
+      padding: 12px;
+      width: 280px;
+      font-size: 18px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 18px;
+      margin-top: 20px;
+      background: #ff6b00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    pre { 
+      margin-top: 20px; 
+      font-size: 20px; 
+      font-weight: bold; 
+    }
+  </style>
+</head>
+<body>
+
+<h1>Coupon Eligibility Checker</h1>
+
+<input id="number" placeholder="Phone number" maxlength="10" />
+
+<br>
+
+<select id="coupon">
+  <option value="ORANGE15">ORANGE15</option>
+  <option value="OHSUPER">OHSUPER</option>
+  <option value="OHVALUE">OHVALUE</option>
+  <option value="OHFAMILY">OHFAMILY</option>
+  <option value="FAMILY">FAMILY</option>
+  <option value="SENIOR">SENIOR</option>
+</select>
+
+<br>
+
+<button onclick="checkCoupon()">Check Eligibility</button>
+
+<pre id="result"></pre>
+
+<script>
+async function checkCoupon() {
+  const WORKER = "https://rapid-cake-322c.imashishrohra.workers.dev/";
+
+  const number = document.getElementById("number").value.trim();
+  const coupon = document.getElementById("coupon").value;
+  const result = document.getElementById("result");
+
+  if (!/^\d{10}$/.test(number)) {
+    result.textContent = "❌ Enter valid 10-digit number";
+    result.style.color = "red";
+    return;
+  }
+
+  result.textContent = "Checking...";
+  result.style.color = "black";
+
+  const fd = new FormData();
+
+  fd.append("customer_name", "Ashish RohraJames");
+  fd.append("customer_number", number);
+  fd.append("city_code", "BLR");
+  fd.append("patient_id_client", "2011699");
+  fd.append("patient_name", "Ashish RohraJames");
+  fd.append("age", "65");
+  fd.append("gender", "Female");
+
+  fd.append("test_list", '[{"masterTestId":1010823}]');
+  fd.append("panel_list", "[]");
+
+  fd.append("additional_patient_details[0]patient_id_client", "2216643");
+  fd.append("additional_patient_details[0]patient_name", '"><script>alert()</script>');
+  fd.append("additional_patient_details[0]age", "65");
+  fd.append("additional_patient_details[0]gender", "Female");
+  fd.append("additional_patient_details[0]textual_prescription", "");
+  fd.append("additional_patient_details[0]test_list", '[{"masterTestId":1010823}]');
+  fd.append("additional_patient_details[0]panel_list", "[]");
+
+  fd.append("device_platform", "web");
+  fd.append("voucher_code", coupon);
+  fd.append("other_source_meta", '{"referrer":"https://www.orangehealth.in/","partner":null}');
+
+  try {
+    const res = await fetch(WORKER, {
+      method: "POST",
+      body: fd
+    });
+
+    const data = await res.json();
+
+    if (data?.voucher_details?.error_message) {
+      result.textContent = "❌ Not Eligible – " + data.voucher_details.error_message;
+      result.style.color = "red";
+    } else {
+      result.textContent = "✅ Eligible";
+      result.style.color = "green";
+    }
+
+  } catch (err) {
+    result.textContent = "Error: " + err.message;
+    result.style.color = "red";
+  }
+}
+</script>
+
+</body>
+</html>
