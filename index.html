@@ -59,6 +59,7 @@
 
 <script>
 async function checkCoupon() {
+
   const WORKER = "https://rapid-cake-322c.imashishrohra.workers.dev/";
 
   const number = document.getElementById("number").value.trim();
@@ -87,8 +88,9 @@ async function checkCoupon() {
   fd.append("test_list", '[{"masterTestId":1010823}]');
   fd.append("panel_list", "[]");
 
+  // 🔥 FIXED: removed script injection, replaced with safe name
   fd.append("additional_patient_details[0]patient_id_client", "2216643");
-  fd.append("additional_patient_details[0]patient_name", '"><script>alert()</script>');
+  fd.append("additional_patient_details[0]patient_name", "Test");
   fd.append("additional_patient_details[0]age", "65");
   fd.append("additional_patient_details[0]gender", "Female");
   fd.append("additional_patient_details[0]textual_prescription", "");
@@ -100,11 +102,7 @@ async function checkCoupon() {
   fd.append("other_source_meta", '{"referrer":"https://www.orangehealth.in/","partner":null}');
 
   try {
-    const res = await fetch(WORKER, {
-      method: "POST",
-      body: fd
-    });
-
+    const res = await fetch(WORKER, { method: "POST", body: fd });
     const data = await res.json();
 
     if (data?.voucher_details?.error_message) {
